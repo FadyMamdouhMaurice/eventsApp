@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645858532053",
+    "project_id": "symstax-events",
+    "storage_bucket": "symstax-events.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645858532053:android:c6c32671ec782ae33c205c",
+        "android_client_info": {
+          "package_name": "com.example.symstax_events"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQMVPfuo3bVHEvjRn0z_K36Ao8KCEjioY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
