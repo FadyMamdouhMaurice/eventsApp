@@ -1,3 +1,4 @@
+/*
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:symstax_events/Models/user_model.dart';
 
@@ -19,4 +20,4 @@ class AuthViewModel {
     }
     return null;
   }
-}
+}*/

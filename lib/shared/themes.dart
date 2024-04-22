@@ -23,6 +23,27 @@ class MyThemeData {
           color: Colors.white,
           fontSize: 18,
         )),
+    appBarTheme: AppBarTheme(
+      color: Colors.green,
+      titleTextStyle: TextStyle(
+        color: whiteTextColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      )
+    ),
+    elevatedButtonTheme: const ElevatedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(Colors.green),
+        textStyle: MaterialStatePropertyAll(TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold,)),
+
+      ),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: Colors.green,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: Colors.green,
+    )
   );
   static ThemeData darkTheme = ThemeData(
     primarySwatch: Colors.green,

@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:symstax_events/Models/user_model.dart';
 import 'package:symstax_events/Provider/riverpod.dart';
-import 'package:symstax_events/shared/auth_view_model.dart';
+import 'package:symstax_events/Screens/home_screen.dart';
+import 'package:symstax_events/shared/firebase_functions.dart';
+import '../shared/reusable_widgets.dart';
 
-final authViewModelProvider = Provider<AuthViewModel>((ref) => AuthViewModel());
+final themeProvider =
+    StateNotifierProvider<ThemeNotifier, bool>((ref) => ThemeNotifier());
 
-class SignupScreen extends StatelessWidget {
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+
+class SignupScreen extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  Widget build(BuildContext context, watch) {
+    final myTheme = watch.read(themeProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
         actions: [
-          Consumer(builder: (context, watch, _) {
-            final container = ProviderScope.containerOf(context, listen: false);
-            final isDarkModeEnabled = watch.read(themeProvider);
-            return IconButton(
-              icon: Icon(isDarkModeEnabled ? Icons.light_mode : Icons.dark_mode),
-              onPressed: () {
-                container.read(themeProvider.notifier).toggleTheme();
-              },
-            );
-          }),
+          IconButton(
+            icon: Icon(myTheme ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              watch.read(themeProvider.notifier).toggleTheme();
+            },
+          )
         ],
       ),
       body: Consumer(builder: (context, ref, _) {
-        final authViewModel = ref.read(authViewModelProvider);
         return Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -49,30 +49,26 @@ class SignupScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  String email = emailController.text.trim();
-                  String password = passwordController.text.trim();
-
-                  if (email.isNotEmpty && password.isNotEmpty) {
-                    UserModel? user =
-                    await authViewModel.signUp(email, password);
-                    if (user != null) {
-                      // Navigate to home screen or do something else
-                    } else {
-                      // Show error message
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Sign up failed'),
-                      ));
-                    }
+              MyButtonWidget(
+                text: 'Sign Up',
+                onClicked: () async {
+                  bool success = await FirebaseFunctions().signUpWithEmailAndPassword(
+                      emailController.text.trim(),
+                      passwordController.text.trim());if (success) {
+                    // Navigate to the next screen if login is successful
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()), // Replace with the actual next screen
+                    );
                   } else {
-                    // Show error message
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Please fill in all fields'),
-                    ));
+                    // Show an error message or handle login failure
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Login failed. Please check your credentials.'),
+                      ),
+                    );
                   }
                 },
-                child: Text('Sign Up'),
               ),
             ],
           ),

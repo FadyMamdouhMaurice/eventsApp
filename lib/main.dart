@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:symstax_events/Provider/riverpod.dart';
+import 'package:symstax_events/Events/view_event.dart';
 import 'package:symstax_events/Screens/signup_screen.dart';
+import 'package:symstax_events/Screens/welcome_screen.dart';
 import 'package:symstax_events/firebase_options.dart';
 import 'package:symstax_events/shared/themes.dart';
 
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
       */
-          home: SignupScreen(),
+          home: WelcomeScreen(),
         );
       },
     );
