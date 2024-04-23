@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:symstax_events/Models/event_model.dart';
 
 class FirebaseFunctions {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get the current user ID
@@ -20,8 +19,8 @@ class FirebaseFunctions {
   // Function to sign up a user with email and password
   Future<bool> signUpWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -39,8 +38,8 @@ class FirebaseFunctions {
   // Function to login a user with email and password
   Future<bool> loginWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -76,8 +75,9 @@ class FirebaseFunctions {
   // Stream to listen to changes in the list of events
   Stream<List<EventModel>> viewEvents() {
     try {
-      return getEventCollection().snapshots().map((snapshot) =>
-          snapshot.docs.map((doc) => doc.data()).toList());
+      return getEventCollection()
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
     } catch (e) {
       print('Error retrieving events: $e');
       throw Exception('Failed to retrieve events: $e');
@@ -85,18 +85,19 @@ class FirebaseFunctions {
   }
 
   // Function to update a user's interest in an event
-  Future<void> updateUserInterest(String userId, String eventId,
-      bool interested) async {
+  Future<void> updateUserInterest(
+      String userId, String eventId, bool interested) async {
     try {
       // Get a reference to the user document
-      DocumentReference userRef = FirebaseFirestore.instance.collection('users')
-          .doc(userId);
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
 
       // Add or remove the event from the interests subcollection based on the interested status
       if (interested) {
         // Add the user ID to the event's interested_users subcollection
-        DocumentReference eventRef = FirebaseFirestore.instance.collection(
-            'Events').doc(eventId.toString());
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
         await eventRef.collection('interested_users').doc(userId).set({
           'user_id': userId,
         });
@@ -107,8 +108,9 @@ class FirebaseFunctions {
         });
       } else {
         // Remove the user ID from the event's interested_users subcollection
-        DocumentReference eventRef = FirebaseFirestore.instance.collection(
-            'Events').doc(eventId.toString());
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
         await eventRef.collection('interested_users').doc(userId).delete();
 
         // Remove the event from the user's interests subcollection
@@ -120,37 +122,35 @@ class FirebaseFunctions {
     }
   }
 
-  // Function to fetch interested events for a user
-  Future<List<EventModel>> getInterestedEvents(String userId) async {
+  Stream<List<EventModel>> getInterestedEventsStream(String userId) {
     try {
       // Get a reference to the user's interests subcollection
-      QuerySnapshot interestsSnapshot = await FirebaseFirestore.instance
+      return FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection('interests')
-          .get();
+          .snapshots()
+          .asyncMap((snapshot) async {
+        // List to store the interested events
+        List<EventModel> interestedEvents = [];
 
-      // List to store the interested event IDs
-      List<String> eventIds = interestsSnapshot.docs.map((doc) => doc.id)
-          .toList();
+        // Iterate over the documents in the snapshot
+        for (DocumentSnapshot doc in snapshot.docs) {
+          // Fetch the event document using the document ID
+          DocumentSnapshot eventSnapshot = await FirebaseFirestore.instance
+              .collection('Events')
+              .doc(doc.id)
+              .get();
 
-      // List to store the interested events
-      List<EventModel> interestedEvents = [];
-
-      // Fetch the events using the IDs
-      for (String eventId in eventIds) {
-        DocumentSnapshot eventSnapshot = await FirebaseFirestore.instance
-            .collection('Events')
-            .doc(eventId)
-            .get();
-
-        if (eventSnapshot.exists) {
-          interestedEvents.add(EventModel.fromJson(
-              eventSnapshot.data() as Map<String, dynamic>));
+          if (eventSnapshot.exists) {
+            // Convert the event document to an EventModel object and add it to the list
+            interestedEvents.add(EventModel.fromJson(
+                eventSnapshot.data() as Map<String, dynamic>));
+          }
         }
-      }
 
-      return interestedEvents;
+        return interestedEvents;
+      });
     } catch (e) {
       print('Error fetching interested events: $e');
       throw Exception('Failed to fetch interested events: $e');
@@ -158,18 +158,20 @@ class FirebaseFunctions {
   }
 
   // Function to update a user's going status for an event
-  Future<void> updateUserGoing(String userId, String eventId,
-      bool going) async {
+/*
+  Future<void> updateUserGoing(
+      String userId, String eventId, bool going) async {
     try {
       // Get a reference to the user document
-      DocumentReference userRef = FirebaseFirestore.instance.collection('users')
-          .doc(userId);
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
 
       // Add or remove the event from the going subcollection based on the going status
       if (going) {
         // Add the user ID to the event's going_users subcollection
-        DocumentReference eventRef = FirebaseFirestore.instance.collection(
-            'Events').doc(eventId.toString());
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
         await eventRef.collection('going_users').doc(userId).set({
           'user_id': userId,
         });
@@ -180,8 +182,65 @@ class FirebaseFunctions {
         });
       } else {
         // Remove the user ID from the event's going_users subcollection
-        DocumentReference eventRef = FirebaseFirestore.instance.collection(
-            'Events').doc(eventId.toString());
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
+        await eventRef.collection('going_users').doc(userId).delete();
+
+        // Remove the event from the user's going subcollection
+        await userRef.collection('going').doc(eventId.toString()).delete();
+      }
+    } catch (e) {
+      print('Error updating user going: $e');
+      throw Exception('Failed to update user going: $e');
+    }
+  }
+*/
+
+  // Function to get the count of users interested in an event
+  Stream<int> getInterestedUsersCountStream(String eventId) {
+    try {
+      // Get a reference to the interested_users subcollection of the event
+      Stream<QuerySnapshot> stream = FirebaseFirestore.instance
+          .collection('Events')
+          .doc(eventId)
+          .collection('interested_users')
+          .snapshots();
+
+      // Map the stream of snapshots to a stream of counts
+      return stream.map((snapshot) => snapshot.size);
+    } catch (e) {
+      print('Error getting interested users count: $e');
+      throw Exception('Failed to get interested users count: $e');
+    }
+  }
+
+  Future<void> updateUserGoing(
+      String userId, String eventId, bool going) async {
+    try {
+      // Get a reference to the user document
+      DocumentReference userRef =
+      FirebaseFirestore.instance.collection('users').doc(userId);
+
+      // Add or remove the event from the going subcollection based on the going status
+      if (going) {
+        // Add the user ID to the event's going_users subcollection
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
+        await eventRef.collection('going_users').doc(userId).set({
+          'user_id': userId,
+        });
+
+        // Add the event to the user's going subcollection
+        await userRef.collection('going').doc(eventId.toString()).set({
+          'event_id': eventId,
+        });
+      } else {
+        // Remove the user ID from the event's going_users subcollection
+        DocumentReference eventRef = FirebaseFirestore.instance
+            .collection('Events')
+            .doc(eventId.toString());
         await eventRef.collection('going_users').doc(userId).delete();
 
         // Remove the event from the user's going subcollection
@@ -193,21 +252,55 @@ class FirebaseFunctions {
     }
   }
 
-  // Function to get the count of users interested in an event
-  Future<int> getInterestedUsersCount(String eventId) async {
+  Stream<List<EventModel>> getGoingEventsStream(String userId) {
     try {
-      // Get a reference to the interested_users subcollection of the event
-      QuerySnapshot interestedUsersSnapshot = await FirebaseFirestore.instance
+      // Get a reference to the user's going subcollection
+      return FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('going')
+          .snapshots()
+          .asyncMap((snapshot) async {
+        // List to store the going events
+        List<EventModel> goingEvents = [];
+
+        // Iterate over the documents in the snapshot
+        for (DocumentSnapshot doc in snapshot.docs) {
+          // Fetch the event document using the document ID
+          DocumentSnapshot eventSnapshot = await FirebaseFirestore.instance
+              .collection('Events')
+              .doc(doc.id)
+              .get();
+
+          if (eventSnapshot.exists) {
+            // Convert the event document to an EventModel object and add it to the list
+            goingEvents.add(EventModel.fromJson(
+                eventSnapshot.data() as Map<String, dynamic>));
+          }
+        }
+
+        return goingEvents;
+      });
+    } catch (e) {
+      print('Error fetching going events: $e');
+      throw Exception('Failed to fetch going events: $e');
+    }
+  }
+
+  Stream<int> getGoingUsersCountStream(String eventId) {
+    try {
+      // Get a reference to the going_users subcollection of the event
+      Stream<QuerySnapshot> stream = FirebaseFirestore.instance
           .collection('Events')
           .doc(eventId)
-          .collection('interested_users')
-          .get();
+          .collection('going_users')
+          .snapshots();
 
-      // Return the count of documents in the interested_users subcollection
-      return interestedUsersSnapshot.size;
+      // Map the stream of snapshots to a stream of counts
+      return stream.map((snapshot) => snapshot.size);
     } catch (e) {
-      print('Error getting interested users count: $e');
-      throw Exception('Failed to get interested users count: $e');
+      print('Error getting going users count: $e');
+      throw Exception('Failed to get going users count: $e');
     }
   }
 }

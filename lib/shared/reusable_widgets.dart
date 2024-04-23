@@ -13,7 +13,6 @@ class MyButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) => ElevatedButton(
     child: Text(
       text,
-      style: TextStyle(fontSize: 24),
     ),
     onPressed: onClicked,
   );

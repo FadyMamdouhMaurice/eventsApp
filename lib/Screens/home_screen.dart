@@ -2,13 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:symstax_events/Events/add_event.dart';
 import 'package:symstax_events/Events/view_event.dart';
+import 'package:symstax_events/Provider/riverpod.dart';
 
 final bottomNavigationBarIndexProvider = StateProvider<int>((ref) => 0);
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, watch) {
+    final myTheme = watch.read(themeProvider);
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(myTheme ? Icons.light_mode : Icons.dark_mode, color: Colors.white),
+            onPressed: () {
+              watch.read(themeProvider.notifier).toggleTheme();
+            },
+          )
+        ],
+      ),
       body: Consumer(
         builder: (context, ref, _) {
           final currentIndex = ref.watch(bottomNavigationBarIndexProvider);
