@@ -8,21 +8,27 @@ import 'package:symstax_events/shared/firebase_functions.dart';
 import 'package:symstax_events/shared/reusable_widgets.dart';
 
 final FirebaseFunctions firebaseFunctions = FirebaseFunctions();
+final TextEditingController titleController = TextEditingController();
+final TextEditingController detailsController = TextEditingController();
+final TextEditingController locationController = TextEditingController();
+final TextEditingController descriptionController = TextEditingController();
+final selectedDateProvider = StateProvider<String>((ref) => 'Choose Date');
 
-class AddEventScreen extends ConsumerWidget {
-  AddEventScreen({super.key});
-
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  final userId = firebaseFunctions.getUserId().toString();
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController detailsController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final selectedDateProvider = StateProvider<String>((ref) => 'Choose Date');
+class AddEventScreen extends ConsumerStatefulWidget {
+  const AddEventScreen({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _AddEventScreenState();
+}
+
+class _AddEventScreenState extends ConsumerState<AddEventScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  //DateTime _selectedDate = DateTime.now();
+  final userId = firebaseFunctions.getUserId().toString();
+  @override
+  Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     final eventDate = ref.watch(selectedDateProvider);
 
     return Scaffold(
@@ -88,6 +94,7 @@ class AddEventScreen extends ConsumerWidget {
                         titleController.clear();
                         descriptionController.clear();
                         detailsController.clear();
+                        ref.read(selectedDateProvider.notifier).state = 'Choose Date';
                         Navigator.push(
                           context,
                           MaterialPageRoute(
