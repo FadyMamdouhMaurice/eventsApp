@@ -96,7 +96,7 @@ class goingNotifier extends StateNotifier<bool> {
   }
 }
 
-// Provider for fetching events the user is interested in
+// Provider for fetching events the user is interested in For View Event Screen
 final interestedEventsProvider = StreamProvider<List<EventModel>>((ref) {
   final firebaseFunctions = ref.read(firebaseFunctionsProvider);
   final userId = firebaseFunctions.getUserId();
@@ -107,7 +107,7 @@ final interestedEventsProvider = StreamProvider<List<EventModel>>((ref) {
   }
 });
 
-// Provider for checking if a specific event is marked as interested by the user
+// Provider for checking if a specific event is marked as interested by the user For View Event Screen
 final isEventInterestedProvider =
     StreamProvider.family<bool, String>((ref, eventId) {
   final interestedEventsStream = ref.watch(interestedEventsProvider.stream);
@@ -115,14 +115,14 @@ final isEventInterestedProvider =
       interestedEvents.any((event) => event.id == eventId));
 });
 
-// Provider for fetching the count of users interested in a specific event
+// Provider for fetching the count of users interested in a specific event For View Event Screen
 final interestedUsersCountProvider =
     StreamProvider.family<int, String>((ref, eventId) {
   final firebaseFunctions = ref.read(firebaseFunctionsProvider);
   return firebaseFunctions.getInterestedUsersCountStream(eventId);
 });
 
-// Provider for fetching events the user is going to attend
+// Provider for fetching events the user is going to attend For View Event Screen
 final goingEventsProvider = StreamProvider<List<EventModel>>((ref) {
   final firebaseFunctions = ref.read(firebaseFunctionsProvider);
   final userId = firebaseFunctions.getUserId();
@@ -133,7 +133,7 @@ final goingEventsProvider = StreamProvider<List<EventModel>>((ref) {
   }
 });
 
-// Provider for checking if a specific event is marked as going by the user
+// Provider for checking if a specific event is marked as going by the user For View Event Screen
 final isEventGoingProvider =
     StreamProvider.family<bool, String>((ref, eventId) {
   final goingEventsStream = ref.watch(goingEventsProvider.stream);
@@ -141,7 +141,7 @@ final isEventGoingProvider =
       .map((goingEvents) => goingEvents.any((event) => event.id == eventId));
 });
 
-// Provider for fetching the count of users going to a specific event
+// Provider for fetching the count of users going to a specific event For View Event Screen
 final goingUsersCountProvider =
     StreamProvider.family<int, String>((ref, eventId) {
   final firebaseFunctions = ref.read(firebaseFunctionsProvider);
@@ -150,3 +150,25 @@ final goingUsersCountProvider =
 
 // Provider for managing the search query
 final searchQueryProvider = StateProvider<String>((ref) => '');
+
+
+// Provider for checking if a specific event is marked as interested by the user For Search Screen
+final isSearchedEventInterestedProvider = Provider.family<bool, String>((ref, eventId) {
+  final interestedEventsStream = ref.watch(interestedEventsProvider);
+  return interestedEventsStream.maybeWhen(
+    data: (interestedEvents) =>
+        interestedEvents.any((event) => event.id == eventId),
+    orElse: () => false,
+  );
+});
+
+
+// Provider for checking if a specific event is marked as Going by the user For Search Screen
+final isSearchedEventGoingProvider = Provider.family<bool, String>((ref, eventId) {
+  final goingEventsStream = ref.watch(goingEventsProvider);
+  return goingEventsStream.maybeWhen(
+    data: (goingEvents) =>
+        goingEvents.any((event) => event.id == eventId),
+    orElse: () => false,
+  );
+});

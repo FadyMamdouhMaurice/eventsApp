@@ -5,9 +5,9 @@ import 'package:share/share.dart';
 import 'package:symstax_events/Events/search_event.dart';
 import 'package:symstax_events/Events/view_event_location.dart';
 import 'package:symstax_events/Provider/riverpod.dart';
-import 'package:symstax_events/Screens/map_screen.dart';
 import 'package:symstax_events/shared/firebase_functions.dart';
 import 'package:symstax_events/Models/event_model.dart';
+import 'package:symstax_events/shared/map_functions.dart';
 
 FirebaseFunctions firebaseFunctions = FirebaseFunctions();
 
@@ -23,7 +23,7 @@ class ViewEventScreen extends ConsumerWidget {
     final interestedEventsAsyncValue = ref.watch(interestedEventsProvider);
     final goingEventsAsyncValue = ref.watch(goingEventsProvider);
     final userId = firebaseFunctions.getUserId();
-    final searchQuery = ref.watch(searchQueryProvider);
+    //final searchQuery = ref.watch(searchQueryProvider);
     final List<EventModel> allEvents = eventsAsyncValue.value ?? [];
     final List<EventModel> interestedEvents = interestedEventsAsyncValue.value ?? [];
     final List<EventModel> goinigEvents = goingEventsAsyncValue.value ?? [];
@@ -103,7 +103,7 @@ class ViewEventScreen extends ConsumerWidget {
                                       icon: const Icon(Icons.share),
                                       onPressed: () {
                                         // Call share function here
-                                        _shareEvent(event);
+                                        shareEvent(event);
                                       },
                                     ),
                                   ],
@@ -242,23 +242,5 @@ class ViewEventScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-  void _shareEvent(EventModel event) {
-    // Define the content to share
-    final String text = 'Check out this event: ${event.title}\nDate: ${event.date}\nLocation: ${event.location}';
-
-    // Share event details using Flutter's share functionality
-    Share.share(text);
-  }
-
-  LatLng parseLocation(String locationString) {
-    final latLngRegex = RegExp(r'LatLng\(([\d.-]+), ([\d.-]+)\)');
-    final match = latLngRegex.firstMatch(locationString);
-    late double latitude, longitude;
-    if (match != null && match.groupCount == 2) {
-      latitude = double.parse(match.group(1).toString());
-      longitude = double.parse(match.group(2).toString());
-    }
-    return LatLng(latitude, longitude);
   }
 }

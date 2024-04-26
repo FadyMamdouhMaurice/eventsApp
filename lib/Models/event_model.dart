@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:share/share.dart';
 
 class EventModel {
   String id;
@@ -36,4 +36,12 @@ class EventModel {
       "location":location,
       "description": description, // Include description in toJson
     };}
+}
+
+void shareEvent(EventModel event) {
+  // Define the content to share
+  final String text = 'Check out this event: ${event.title}\nDate: ${event.date}\nLocation: ${event.location}';
+
+  // Share event details using Flutter's share functionality
+  Share.share(text);
 }

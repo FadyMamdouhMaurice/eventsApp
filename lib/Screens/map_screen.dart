@@ -86,7 +86,6 @@ class _MapScreenState extends State<MapScreen> {
                 child: MyButtonWidget(
                   onClicked: () async {
                     if (eventLocation != null) {
-                      print (widget.event.date);
                       await FirebaseFunctions().addEvent(widget.event); // Add event to Firebase
                       Navigator.push(
                         context,
