@@ -1,28 +1,31 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:symstax_events/Models/event_model.dart';
-import 'package:symstax_events/Provider/riverpod.dart';
+import 'package:symstax_events/Screens/map_screen.dart';
 import 'package:symstax_events/shared/firebase_functions.dart';
 import 'package:symstax_events/shared/reusable_widgets.dart';
 import 'package:intl/intl.dart';
 
-final TextEditingController _titleController = TextEditingController();
-final TextEditingController _detailsController = TextEditingController();
-final TextEditingController _locationController = TextEditingController();
-final TextEditingController _descriptionController = TextEditingController();
+final TextEditingController titleController = TextEditingController();
+final TextEditingController detailsController = TextEditingController();
+final TextEditingController locationController = TextEditingController();
+final TextEditingController descriptionController = TextEditingController();
+final selectedDateProvider = StateProvider<String>((ref) => 'Choose Date');
+final FirebaseFunctions firebaseFunctions = FirebaseFunctions();
 
 class AddEventScreen extends ConsumerWidget {
   AddEventScreen({super.key});
 
-  static GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  DateTime? _selectedDate;
-  final FirebaseFunctions firebaseFunctions = FirebaseFunctions();
-  final selectedDateProvider = StateProvider<DateTime?>((ref) => null);
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  //DateTime _selectedDate = DateTime.now();
+  final userId = firebaseFunctions.getUserId().toString();
 
   @override
   Widget build(BuildContext context, ref) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    final eventDate = ref.watch(selectedDateProvider);
 
     return Scaffold(
       body: Padding(
@@ -33,8 +36,8 @@ class AddEventScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Title*'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a title';
@@ -43,84 +46,112 @@ class AddEventScreen extends ConsumerWidget {
                 },
               ),
               SizedBox(height: screenWidth * 0.02),
-              TextFormField(
-                controller: _detailsController,
-                decoration: InputDecoration(labelText: 'Details'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter details';
-                  }
-                  return null;
-                },
+              Flexible(
+                child: TextFormField(
+                  controller: detailsController,
+                  decoration: const InputDecoration(labelText: 'Details*'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter details';
+                    }
+                    return null;
+                  },
+                ),
               ),
               SizedBox(height: screenWidth * 0.02),
-              TextFormField(
-                controller: _locationController,
-                decoration: InputDecoration(labelText: 'Location'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a location';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: screenWidth * 0.02),
-              TextFormField(
-                controller: _descriptionController,
-                decoration:
-                InputDecoration(labelText: 'Description (optional)'),
+              Flexible(
+                child: TextFormField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                      labelText: 'Description'),
+                ),
               ),
               SizedBox(height: screenWidth * 0.04),
               Row(
                 children: [
-                  Text('Date:'),
-                  SizedBox(width: screenWidth * 0.02),
                   Text(
-                    _selectedDate == null
-                        ? 'Choose Date'
-                        : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                    eventDate,
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
                   IconButton(
                     onPressed: () async {
                       final DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: _selectedDate ?? DateTime.now(),
+                        initialDate: DateTime.now(),
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365)),
+                        builder: (BuildContext context, Widget? child) {
+                          return MediaQuery(
+                            data: MediaQuery.of(context).copyWith(
+                              // Adjust dialog width based on screen width
+                              alwaysUse24HourFormat: false,
+                            ),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                // Adjust dialog theme to match app's theme
+                                colorScheme: ColorScheme.light(
+                                  primary: Theme.of(context).primaryColor,
+                                  onPrimary: Theme.of(context).colorScheme.onPrimary,
+                                ),
+                                dialogBackgroundColor: Theme.of(context).dialogBackgroundColor,
+                                textTheme: Theme.of(context).textTheme.copyWith(
+                                  // Adjust font size based on screen width
+                                  titleMedium: TextStyle(fontSize: screenWidth * 0.04),
+                                  labelLarge: TextStyle(fontSize: screenWidth * 0.04),
+                                ),
+                              ),
+                              child: child!,
+                            ),
+                          );
+                        },
                       );
                       if (pickedDate != null) {
-                        _selectedDate = pickedDate;
+                        ref.read(selectedDateProvider.notifier).state =
+                            DateFormat('yyyy-MM-dd')
+                                .format(pickedDate)
+                                .toString();
+                        //_selectedDate = pickedDate;
                       }
                     },
-                    icon: Icon(Icons.calendar_today),
+                    iconSize: screenWidth * 0.06,
+                    icon: const Icon(Icons.calendar_today),
                   ),
                 ],
               ),
               SizedBox(height: screenWidth * 0.04),
-              MyButtonWidget(
-                text: 'Submit',
-                onClicked: () async {
-                  final FirebaseAuth _auth = FirebaseAuth.instance;
-                  if (_formKey.currentState!.validate()) {
-                    final event = EventModel(
-                      title: _titleController.text,
-                      description: _descriptionController.text,
-                      location: _locationController.text,
-                      date: _selectedDate!,
-                      details: _detailsController.text,
-                      id: _auth.currentUser!.uid,
-                    );
-                    bool added = await FirebaseFunctions().addEvent(event);
-
-                    if (added) {
-                      ref.read(eventListProvider.notifier).addEvent(event);
-                      _titleController.clear();
-                      _descriptionController.clear();
-                      _detailsController.clear();
-                      _locationController.clear();
+              Flexible(
+                child: MyButtonWidget(
+                  text: 'Choose Event Location',
+                  onClicked: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await Permission.locationWhenInUse.isDenied.then((value) {
+                        if (value) {
+                          Permission.locationWhenInUse.request();
+                        }
+                        final event = EventModel(
+                          title: titleController.text,
+                          description: descriptionController.text,
+                          date: eventDate,
+                          details: detailsController.text,
+                          id: userId,
+                          location: '',
+                        );
+                        titleController.clear();
+                        descriptionController.clear();
+                        detailsController.clear();
+                        locationController.clear();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                    event: event,
+                                  )),
+                        );
+                      });
                     }
-                  }
-                },
+                  },
+                ),
               ),
             ],
           ),

@@ -8,6 +8,8 @@ final TextEditingController emailController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 
 class SignupScreen extends ConsumerWidget {
+  const SignupScreen({super.key});
+
   @override
   Widget build(BuildContext context, watch) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -15,7 +17,7 @@ class SignupScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: Consumer(builder: (context, ref, _) {
         return Padding(
@@ -25,28 +27,29 @@ class SignupScreen extends ConsumerWidget {
             children: [
               SizedBox(height: screenHeight * 0.1), // Add vertical spacing
               SizedBox(
-                width: screenWidth * 0.9, // Adjust width based on screen width
+                width: screenWidth * 0.9,
                 child: TextField(
                   controller: emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                   ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02), // Add vertical spacing
               SizedBox(
-                width: screenWidth * 0.9, // Adjust width based on screen width
+                width: screenWidth * 0.9,
                 child: TextField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                   ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02), // Add vertical spacing
               SizedBox(
-                width: screenWidth * 0.9, // Adjust width based on screen width
+                width: screenWidth * 0.9,
+                height: screenHeight * 0.05,
                 child: MyButtonWidget(
                   text: 'Sign Up',
                   onClicked: () async {
@@ -55,15 +58,17 @@ class SignupScreen extends ConsumerWidget {
                       passwordController.text.trim(),
                     );
                     if (success) {
+                      emailController.clear();
+                      passwordController.clear();
                       // Navigate to the next screen if signup is successful
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()), // Replace with the actual next screen
+                        MaterialPageRoute(builder: (context) => const HomeScreen()), // Replace with the actual next screen
                       );
                     } else {
                       // Show an error message or handle signup failure
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Sign up failed. Please try again.'),
                         ),
                       );

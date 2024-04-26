@@ -19,18 +19,17 @@ class FirebaseFunctions {
   // Function to sign up a user with email and password
   Future<bool> signUpWithEmailAndPassword(String email, String password) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       // User signed up successfully
-      User? user = userCredential.user;
+      //User? user = userCredential.user;
       // You can perform additional tasks here, such as saving user data to Firestore
       return true;
     } catch (e) {
       // Handle signup errors
-      print('Signup error: $e');
+      //print('Signup error: $e');
       return false;
     }
   }
@@ -43,11 +42,12 @@ class FirebaseFunctions {
         email: email,
         password: password,
       );
+
       return true;
       // Navigate to the next screen or do something else upon successful login
     } catch (e) {
       // Show an error message or handle the error appropriately
-      print('Login error: $e');
+      //print('Login error: $e');
       return false;
     }
   }
@@ -79,7 +79,7 @@ class FirebaseFunctions {
           .snapshots()
           .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
     } catch (e) {
-      print('Error retrieving events: $e');
+      //print('Error retrieving events: $e');
       throw Exception('Failed to retrieve events: $e');
     }
   }
@@ -117,7 +117,7 @@ class FirebaseFunctions {
         await userRef.collection('interests').doc(eventId.toString()).delete();
       }
     } catch (e) {
-      print('Error updating user interest: $e');
+      //print('Error updating user interest: $e');
       throw Exception('Failed to update user interest: $e');
     }
   }
@@ -152,7 +152,7 @@ class FirebaseFunctions {
         return interestedEvents;
       });
     } catch (e) {
-      print('Error fetching interested events: $e');
+      //print('Error fetching interested events: $e');
       throw Exception('Failed to fetch interested events: $e');
     }
   }
@@ -210,7 +210,7 @@ class FirebaseFunctions {
       // Map the stream of snapshots to a stream of counts
       return stream.map((snapshot) => snapshot.size);
     } catch (e) {
-      print('Error getting interested users count: $e');
+      //print('Error getting interested users count: $e');
       throw Exception('Failed to get interested users count: $e');
     }
   }
@@ -247,7 +247,7 @@ class FirebaseFunctions {
         await userRef.collection('going').doc(eventId.toString()).delete();
       }
     } catch (e) {
-      print('Error updating user going: $e');
+      //print('Error updating user going: $e');
       throw Exception('Failed to update user going: $e');
     }
   }
@@ -282,7 +282,7 @@ class FirebaseFunctions {
         return goingEvents;
       });
     } catch (e) {
-      print('Error fetching going events: $e');
+      //print('Error fetching going events: $e');
       throw Exception('Failed to fetch going events: $e');
     }
   }
@@ -299,7 +299,7 @@ class FirebaseFunctions {
       // Map the stream of snapshots to a stream of counts
       return stream.map((snapshot) => snapshot.size);
     } catch (e) {
-      print('Error getting going users count: $e');
+      //print('Error getting going users count: $e');
       throw Exception('Failed to get going users count: $e');
     }
   }

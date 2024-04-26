@@ -4,7 +4,7 @@ class EventModel {
   String id;
   String title;
   String details;
-  DateTime date;
+  String date;
   String location;
   String? description;
 
@@ -21,7 +21,8 @@ class EventModel {
           id: json['id'],
           title: json['title'],
           details: json['details'],
-          date: (json['date'] as Timestamp).toDate(), // Convert Timestamp to DateTime
+          //date: (json['date'] as Timestamp).toDate(), // Convert Timestamp to DateTime
+          date: json['date'],
           location: json['location'],
           description: json['description']); // Assign null if not present in JSON
 
@@ -30,7 +31,8 @@ class EventModel {
       "id": id,
       "title":title,
       "details":details,
-      "date":Timestamp.fromDate(date),
+      //"date":Timestamp.fromDate(date),
+      "date":date,
       "location":location,
       "description": description, // Include description in toJson
     };}

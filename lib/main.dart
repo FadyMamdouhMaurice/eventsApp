@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:symstax_events/Provider/riverpod.dart';
-import 'package:symstax_events/Screens/home_screen.dart';
 import 'package:symstax_events/Screens/welcome_screen.dart';
 import 'package:symstax_events/firebase_options.dart';
 import 'package:symstax_events/shared/themes.dart';
@@ -13,7 +12,7 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ProviderScope(child: const MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: isDarkModeEnabled ? MyThemeData.darkTheme(context) : MyThemeData.lightTheme(context),
-          home: WelcomeScreen(),
+          home: const WelcomeScreen(),
         );
       },
     );

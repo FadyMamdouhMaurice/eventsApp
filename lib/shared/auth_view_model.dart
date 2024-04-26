@@ -1,23 +1,18 @@
 /*
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:symstax_events/Models/user_model.dart';
 
 class AuthViewModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<UserModel?> signUp(String email, String password) async {
-    try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = userCredential.user;
-      if (user != null) {
-        return UserModel(email: user.email ?? '', password: '');
-      }
-    } catch (e) {
-      print('Error signing up: $e');
-    }
-    return null;
+  // Stream to listen for authentication state changes
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Method to get the current user ID
+  String? getCurrentUserID() {
+    final User? user = _auth.currentUser;
+    return user?.uid;
   }
-}*/
+
+// Other authentication-related methods can be added here
+}
+*/
